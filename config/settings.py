@@ -25,7 +25,13 @@ SECRET_KEY = "django-insecure-0*btpbt59yd7_0rrk6ot5js1*ryh*saoq!fg10!*r798dqp8%2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".ngrok-free.app",
+    ".ngrok-free.dev",
+]
+
 
 
 # Application definition
@@ -39,6 +45,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "users",'rest_framework','drf_yasg',
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "users.auth.firebase_auth.FirebaseAuthentication",
+    ),
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
