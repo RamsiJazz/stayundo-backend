@@ -36,7 +36,7 @@ ALLOWED_HOSTS = [
 # settings.py
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://your-production-frontend.com",
+    "https://stayundo.netlify.app",
 ]
 
 CORS_ALLOW_METHODS = [
@@ -50,6 +50,9 @@ CORS_ALLOW_HEADERS = [
     "origin",
     "x-csrftoken",
     "x-requested-with",
+]
+CSRF_TRUSTED_ORIGINS = [
+    "https://stayundo.netlify.app",
 ]
 
 import os
