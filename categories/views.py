@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from .models import HousingCategory, ExpenseCategory
 from .serializers import HousingCategorySerializer, ExpenseCategorySerializer
 from .permissions import IsAdminOrReadOnly, IsOwnerOrAdmin
-
+from rest_framework.parsers import MultiPartParser, FormParser
 
 # --- Housing Categories  ---
 
@@ -15,19 +15,19 @@ class HousingCategoryListView(generics.ListAPIView):
     serializer_class = HousingCategorySerializer
     permission_classes = [permissions.AllowAny]
 
-
 class HousingCategoryAdminView(generics.ListCreateAPIView):
     """Admin only: Create/manage housing categories"""
     queryset = HousingCategory.objects.all()
     serializer_class = HousingCategorySerializer
     permission_classes = [IsAdminOrReadOnly]
-
+    parser_classes = [MultiPartParser, FormParser]
 
 class HousingCategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = HousingCategory.objects.all()
     serializer_class = HousingCategorySerializer
     permission_classes = [IsAdminOrReadOnly]
     lookup_field = 'slug'
+    parser_classes = [MultiPartParser, FormParser]
 
 
 # --- Expense Categories ---
@@ -37,17 +37,18 @@ class ExpenseCategoryListView(generics.ListAPIView):
     queryset = ExpenseCategory.objects.filter(is_active=True)
     serializer_class = ExpenseCategorySerializer
     permission_classes = [permissions.AllowAny]
-
+   
 
 class ExpenseCategoryAdminView(generics.ListCreateAPIView):
     queryset = ExpenseCategory.objects.all()
     serializer_class = ExpenseCategorySerializer
     permission_classes = [IsAdminOrReadOnly]
-
+    parser_classes = [MultiPartParser, FormParser]
 
 class ExpenseCategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ExpenseCategory.objects.all()
     serializer_class = ExpenseCategorySerializer
     permission_classes = [IsAdminOrReadOnly]
     lookup_field = 'slug'
+    parser_classes = [MultiPartParser, FormParser]
 

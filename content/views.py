@@ -108,6 +108,9 @@ class SupportTicketViewSet(viewsets.ModelViewSet):
     filterset_fields = ['status']
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return SupportTicket.objects.none()
+
         user = self.request.user
         if user.is_staff:
             return SupportTicket.objects.all()

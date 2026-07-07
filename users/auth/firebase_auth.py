@@ -1,3 +1,5 @@
+#users/auth/firebase_auth.py
+
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from firebase_admin import auth as firebase_auth

@@ -30,6 +30,8 @@ class ListingListView(generics.ListAPIView):
     ordering_fields = ['price', 'average_rating', 'created_at']
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Listing.objects.none()
         return Listing.objects.filter(status='published', is_active=True)
 
 
@@ -40,6 +42,8 @@ class ListingDetailView(generics.RetrieveAPIView):
     lookup_field = 'slug'
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Listing.objects.none()
         return Listing.objects.filter(status='published', is_active=True)
 
     def retrieve(self, request, *args, **kwargs):
@@ -67,6 +71,8 @@ class ListingUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'slug'
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Listing.objects.none()
         return Listing.objects.all()
     def get_object(self):
         obj = get_object_or_404(
@@ -83,6 +89,8 @@ class MyListingsView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Listing.objects.none()
         return Listing.objects.filter(seller=self.request.user)
 
 
@@ -103,6 +111,8 @@ class ListingImageDeleteView(generics.DestroyAPIView):
     permission_classes = [IsListingSellerOrAdmin]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return ListingImage.objects.none()
         return ListingImage.objects.filter(listing__slug=self.kwargs['slug'])
 
     def get_object(self):
@@ -141,6 +151,8 @@ class ListingAmenityRemoveView(generics.DestroyAPIView):
     permission_classes = [IsListingSellerOrAdmin]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return ListingAmenityMapping.objects.none()
         return ListingAmenityMapping.objects.filter(listing__slug=self.kwargs['slug'])
 
     def get_object(self):
@@ -161,6 +173,8 @@ class ListingSpecListCreateView(generics.ListCreateAPIView):
         return [permissions.IsAuthenticated()]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return ListingSpecification.objects.none()
         return ListingSpecification.objects.filter(listing__slug=self.kwargs['slug'])
 
     def perform_create(self, serializer):
@@ -174,6 +188,8 @@ class ListingSpecDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsListingSellerOrAdmin]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return ListingSpecification.objects.none()
         return ListingSpecification.objects.filter(listing__slug=self.kwargs['slug'])
 
     def get_object(self):
@@ -210,6 +226,8 @@ class ListingOfferDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsListingSellerOrAdmin]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return ListingOffer.objects.none()
         return ListingOffer.objects.filter(listing__slug=self.kwargs['slug'])
 
     def get_object(self):

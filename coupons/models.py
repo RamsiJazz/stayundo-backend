@@ -1,8 +1,8 @@
 import uuid
-from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from listings.models import Listing
+from users.models import User
 
 
 class Coupon(models.Model):
@@ -47,7 +47,7 @@ class Coupon(models.Model):
     is_active = models.BooleanField(default=True)
 
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        User,
         on_delete=models.SET_NULL,
         null=True, related_name='created_coupons'
     )
@@ -81,7 +81,7 @@ class Coupon(models.Model):
 class CouponUsage(models.Model):
     """Track who used which coupon — enforces per_user_limit"""
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, related_name='usages')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='coupon_usages')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='coupon_usages')
     used_at = models.DateTimeField(auto_now_add=True)
     booking_id = models.UUIDField(blank=True, null=True)   # reference to booking
 

@@ -1,9 +1,7 @@
 #products/serializers.py
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
+from users.models import User
 from .models import Product, ProductCategory
-
-User = get_user_model()
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -32,7 +30,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            'id', 'category', 'title', 'description', 'image', 'price',
+            'id', 'category', 'description', 'title', 'image', 'price',
             'condition', 'location', 'is_available', 'created_at',
         ]
 
@@ -41,7 +39,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 class OwnerContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'phone']  # adjust field names to match your User model
+        fields = ['id', 'name', 'email', 'phone']  # matches users.models.User
 
 
 class ProductContactSerializer(serializers.ModelSerializer):

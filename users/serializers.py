@@ -5,6 +5,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+        read_only_fields = ['role', 'firebase_uid', 'created_at']
 
 class WishlistSerializer(serializers.ModelSerializer):
     class Meta:

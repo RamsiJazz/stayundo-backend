@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-0*btpbt59yd7_0rrk6ot5js1*ryh*saoq!fg10!*r798dqp8%2"
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = [
     "localhost",
@@ -32,7 +33,34 @@ ALLOWED_HOSTS = [
     ".ngrok-free.dev",
 ]
 
+# settings.py
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://your-production-frontend.com",
+]
 
+CORS_ALLOW_METHODS = [
+    "DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT",
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "authorization",   # important — this carries your Firebase token
+    "content-type",
+    "origin",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+import os
+import firebase_admin
+from firebase_admin import credentials
+
+FIREBASE_CRED_PATH = os.path.join(BASE_DIR, "firebase", "stayundoServiceAccountKey.json")
+
+if not firebase_admin._apps:
+    cred = credentials.Certificate(FIREBASE_CRED_PATH)
+    firebase_admin.initialize_app(cred)
 
 # Application definition
 
@@ -43,7 +71,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",  
     "users",'rest_framework','drf_yasg',
+    "booking", "categories", "content",
+    "coupons", "emergency", "listings", 
+    "products", "services", "subscriptions",
+    "applications",
 ]
 
 REST_FRAMEWORK = {
@@ -64,6 +97,7 @@ SWAGGER_SETTINGS = {
 }
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -99,11 +133,11 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        'NAME': 'stayundo_db',
-        'USER': 'postgres',
-        'PASSWORD': '123456',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
     }
 }
 

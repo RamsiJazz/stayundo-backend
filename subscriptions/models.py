@@ -1,8 +1,8 @@
 #subscriptions/models.py
 from django.db import models
-from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
+from users.models import User
 
 
 class SubscriptionPlan(models.Model):
@@ -35,7 +35,7 @@ class UserSubscription(models.Model):
     ]
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        User,
         on_delete=models.CASCADE,
         related_name='subscriptions',
     )

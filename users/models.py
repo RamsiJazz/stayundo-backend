@@ -1,7 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin # <-- NEW
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models import Avg, Count
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
-#class User(AbstractBaseUser, PermissionsMixin):       # <-- CHANGED
+
 class User(models.Model):    
     ROLE_CHOICES = [
         ('buyer', 'Buyer'),
@@ -20,11 +23,25 @@ class User(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-   # is_active = models.BooleanField(default=True)   # <-- NEW
-    #is_staff = models.BooleanField(default=False)   # <-- NEW
+    @property
+    def is_authenticated(self):
+        return True
 
-    #USERNAME_FIELD = "firebase_uid"                 # <-- NEW
-    #REQUIRED_FIELDS = []                            # <-- NEW
+    @property
+    def is_anonymous(self):
+        return False
+                        # <-- NEW
+    @property
+    def is_active(self):
+        return True
+
+    @property
+    def is_staff(self):
+        return self.role == 'admin'
+
+    @property
+    def is_superuser(self):
+        return self.role == 'admin'
 
     def __str__(self):
         return self.firebase_uid
@@ -35,28 +52,59 @@ class Wishlist(models.Model):
         on_delete=models.CASCADE,
         related_name="wishlist"
     )
-
-    # Temporary until Developer 2 creates the Listing model
-    listing_id = models.IntegerField()
+    product = models.ForeignKey(
+        'products.Product',
+        on_delete=models.CASCADE,
+        related_name="wishlisted_by",
+        null= True,
+        blank = True,
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("user", "listing_id")
+        unique_together = ("user", "product")
 
     def __str__(self):
-        return f"{self.user.firebase_uid} - {self.listing_id}"    
+        return f"{self.user.firebase_uid} - {self.product}"    
     
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews")
 
-    # temporary until Dev 2 gives Listing model
-    listing_id = models.IntegerField()
+    listing = models.ForeignKey(
+        'listings.Listing',
+        on_delete=models.CASCADE,
+        related_name="reviews",
+        null=True,
+        blank=True,
+    )
 
-    rating = models.IntegerField()  # 1 to 5 stars
+    rating = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]   # ← added: enforce 1–5
+    )
     comment = models.TextField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ("user", "listing")
+
     def __str__(self):
         return f"{self.user.firebase_uid} - {self.rating}"
+def _recalculate_listing_rating(listing):
+    if listing is None:
+        return
+    stats = listing.reviews.aggregate(avg=Avg('rating'), count=Count('id'))
+    listing.average_rating = round(stats['avg'] or 0, 2)
+    listing.total_reviews = stats['count'] or 0
+    listing.save(update_fields=['average_rating', 'total_reviews'])
+
+
+@receiver(post_save, sender=Review)
+def review_saved(sender, instance, **kwargs):
+    _recalculate_listing_rating(instance.listing)
+
+
+@receiver(post_delete, sender=Review)
+def review_deleted(sender, instance, **kwargs):
+    _recalculate_listing_rating(instance.listing)

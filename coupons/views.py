@@ -3,7 +3,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-
+from drf_yasg.utils import swagger_auto_schema
 from .models import Coupon, CouponUsage
 from .serializers import (
     CouponSerializer, CouponPublicSerializer,
@@ -38,6 +38,8 @@ class CouponUsageListView(generics.ListAPIView):
     permission_classes = [IsAdminOnly]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return CouponUsage.objects.none()
         return CouponUsage.objects.filter(coupon__id=self.kwargs['id'])
 
 
@@ -50,6 +52,7 @@ class CouponValidateView(APIView):
     """
     permission_classes = [permissions.IsAuthenticated]
 
+    @swagger_auto_schema(request_body=CouponValidateSerializer)
     def post(self, request):
         serializer = CouponValidateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -105,4 +108,6 @@ class MyUsedCouponsView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return CouponUsage.objects.none()
         return CouponUsage.objects.filter(user=self.request.user)
