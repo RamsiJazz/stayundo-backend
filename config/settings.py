@@ -54,6 +54,9 @@ CORS_ALLOW_HEADERS = [
     "x-csrftoken",
     "x-requested-with",
 ]
+CSRF_TRUSTED_ORIGINS = [
+    "https://stayundo.netlify.app",
+]
 
 import os
 import firebase_admin
