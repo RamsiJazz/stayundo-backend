@@ -26,7 +26,10 @@ class ServiceViewSet(viewsets.ModelViewSet):
             'mess_detail',
             'transport_detail',
             'hospital_detail',
+            'attraction_detail',
         )
+        if not (self.request.user and self.request.user.is_staff):
+            qs = qs.filter(is_active=True)
         # ?type=mess  ?type=hospital  ?type=taxi etc.
         service_type = self.request.query_params.get('type')
         city = self.request.query_params.get('city')

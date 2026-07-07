@@ -20,8 +20,10 @@ class BookingAdmin(admin.ModelAdmin):
     readonly_fields = ['id', 'rent_amount', 'security_deposit', 'advance_deposit', 'total_amount', 'created_at']
     inlines = [BookingStatusLogInline]
 
+    def has_add_permission(self, request):
+        return False
 
 @admin.register(BookingStatusLog)
 class BookingStatusLogAdmin(admin.ModelAdmin):
     list_display = ['booking', 'old_status', 'new_status', 'changed_by', 'changed_at']
-    readonly_fields = ['booking', 'changed_by', 'old_status', 'new_status', 'changed_at']
+    readonly_fields = ['booking', 'changed_by', 'old_status', 'new_status', 'note','changed_at']

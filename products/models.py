@@ -1,7 +1,6 @@
 #products/models.py
 from django.db import models
-from django.conf import settings
-
+from users.models import User
 
 class ProductCategory(models.Model):
     """e.g. Furniture, Electronics, Vehicles, Kitchen Essentials"""
@@ -10,7 +9,6 @@ class ProductCategory(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class Product(models.Model):
     CONDITION_CHOICES = [
@@ -22,7 +20,7 @@ class Product(models.Model):
 
     category = models.ForeignKey(
         ProductCategory,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="products",
     )
     title = models.CharField(max_length=200)
@@ -33,7 +31,7 @@ class Product(models.Model):
     location = models.CharField(max_length=100)
 
     owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        User,
         on_delete=models.CASCADE,
         related_name="products",
     )

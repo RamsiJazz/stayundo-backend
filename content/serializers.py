@@ -2,7 +2,7 @@
 
 # content/serializers.py
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from users.models import User
 from .models import NewsPost, PublicHoliday, CityClimate, FAQ, SupportTicket
 
 
@@ -48,7 +48,7 @@ class SupportTicketUserSerializer(serializers.ModelSerializer):
     """Minimal nested representation of the ticket owner."""
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']
+        fields = ['id', 'name', 'email']
 
 
 class SupportTicketSerializer(serializers.ModelSerializer):

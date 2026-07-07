@@ -1,6 +1,7 @@
 #products/views.py
 from django.shortcuts import render
-
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.parsers import MultiPartParser, FormParser
 # Create your views here.
 from rest_framework import generics, permissions, filters
 from .models import Product, ProductCategory
@@ -84,7 +85,16 @@ class ProductCreateView(generics.CreateAPIView):
     """Authenticated sellers/admins can post a used product."""
     serializer_class = ProductSerializer
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
+    @swagger_auto_schema(
+        operation_description="Create a product",
+        consumes=["multipart/form-data"],
+        request_body=ProductSerializer,
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+        
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 

@@ -32,7 +32,34 @@ ALLOWED_HOSTS = [
     ".ngrok-free.dev",
 ]
 
+# settings.py
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://your-production-frontend.com",
+]
 
+CORS_ALLOW_METHODS = [
+    "DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT",
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "authorization",   # important — this carries your Firebase token
+    "content-type",
+    "origin",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+import os
+import firebase_admin
+from firebase_admin import credentials
+
+FIREBASE_CRED_PATH = os.path.join(BASE_DIR, "firebase", "stayundoServiceAccountKey.json")
+
+if not firebase_admin._apps:
+    cred = credentials.Certificate(FIREBASE_CRED_PATH)
+    firebase_admin.initialize_app(cred)
 
 # Application definition
 
@@ -43,7 +70,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",  
     "users",'rest_framework','drf_yasg',
+    "booking", "categories", "content",
+    "coupons", "emergency", "listings", 
+    "products", "services", "subscriptions",
+    "applications",
 ]
 
 REST_FRAMEWORK = {
@@ -64,6 +96,7 @@ SWAGGER_SETTINGS = {
 }
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

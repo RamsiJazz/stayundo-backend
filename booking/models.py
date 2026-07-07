@@ -1,11 +1,10 @@
 #booking/models.py
 from django.db import models
-
 # Create your models here.
 import uuid
-from django.conf import settings
 from django.db import models
 from listings.models import Listing
+from users.models import User
 
 
 class Booking(models.Model):
@@ -27,7 +26,7 @@ class Booking(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     listing = models.ForeignKey(Listing, on_delete=models.PROTECT, related_name='bookings')
-    tenant = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='bookings')
+    tenant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
 
     # --- Stay Duration ---
     move_in_date = models.DateField()
@@ -66,7 +65,7 @@ class Booking(models.Model):
 class BookingStatusLog(models.Model):
     """Track every status change for audit trail"""
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name='status_logs')
-    changed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    changed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='booking_status_changes')
     old_status = models.CharField(max_length=20)
     new_status = models.CharField(max_length=20)
     note = models.CharField(max_length=300, blank=True)

@@ -1,9 +1,8 @@
 #listings/models.py
 import uuid
-from django.conf import settings
 from django.db import models
 from categories.models import HousingCategory
-
+from users.models import User
 
 class Listing(models.Model):
 
@@ -20,7 +19,7 @@ class Listing(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     seller = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        User,
         on_delete=models.CASCADE,
         related_name="listings",
     )

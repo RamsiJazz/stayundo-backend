@@ -1,6 +1,5 @@
+#categories/models.py
 from django.db import models
-from django.contrib.auth.models import User
-
 
 class HousingCategory(models.Model):
     """Image 1 - Popular Categories (Hostels, Apartments, Villa, PG)"""

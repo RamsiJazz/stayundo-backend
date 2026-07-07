@@ -29,26 +29,30 @@ class MyBookingsView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Booking.objects.none()
         return Booking.objects.filter(tenant=self.request.user)
 
 
 class MyBookingDetailView(generics.RetrieveAPIView):
     """Tenant: full detail of own booking"""
     serializer_class = BookingDetailSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsTenantOrAdmin]
+    lookup_field = 'id'
 
     def get_queryset(self):
-        return Booking.objects.filter(tenant=self.request.user)
-
-    lookup_field = 'id'
+        if getattr(self, 'swagger_fake_view', False):
+            return Booking.objects.none()
+        return Booking.objects.all()
 
 
 class BookingCancelView(APIView):
     """Tenant: cancel own booking (only if pending)"""
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsTenantOrAdmin]
 
     def patch(self, request, id):
         booking = get_object_or_404(Booking, id=id, tenant=request.user)
+        self.check_object_permissions(request, booking)
 
         if booking.status not in ['pending', 'confirmed']:
             return Response(
@@ -79,25 +83,31 @@ class SellerBookingsView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Booking.objects.none()
         return Booking.objects.filter(listing__seller=self.request.user)
 
 
 class SellerBookingDetailView(generics.RetrieveAPIView):
     """Seller: full detail of a booking on their listing"""
     serializer_class = BookingDetailSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsListingSellerOrAdmin]
     lookup_field = 'id'
 
     def get_queryset(self):
-        return Booking.objects.filter(listing__seller=self.request.user)
+        if getattr(self, 'swagger_fake_view', False):
+            return Booking.objects.none()
+        return Booking.objects.all()
 
 
 class SellerBookingStatusView(APIView):
     """Seller: confirm or reject a booking"""
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsListingSellerOrAdmin]
 
     def patch(self, request, id):
-        booking = get_object_or_404(Booking, id=id, listing__seller=request.user)
+        booking = get_object_or_404(Booking, id=id)
+        self.check_object_permissions(request, booking) 
+
         serializer = BookingStatusUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -129,11 +139,13 @@ class SellerBookingStatusView(APIView):
 class SellerBookingNoteView(generics.UpdateAPIView):
     """Seller: add a note to a booking"""
     serializer_class = BookingSellerNoteSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsListingSellerOrAdmin]
     lookup_field = 'id'
 
     def get_queryset(self):
-        return Booking.objects.filter(listing__seller=self.request.user)
+        if getattr(self, 'swagger_fake_view', False):
+            return Booking.objects.none()
+        return Booking.objects.all()
 
 
 # ── Admin ─────────────────────────────────────────────────────────────────────
