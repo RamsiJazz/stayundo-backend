@@ -1,6 +1,12 @@
+#users/serializers.py
 from rest_framework import serializers
 from .models import User, Wishlist, Review
 
+
+class RegisterSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False, allow_blank=True)
+    location = serializers.CharField(required=False, allow_blank=True)
+    
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

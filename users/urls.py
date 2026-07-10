@@ -1,7 +1,7 @@
 #users/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import UserViewSet,ProfileView,WishlistViewSet,ReviewViewSet
+from .views import UserViewSet,ProfileView,WishlistViewSet,ReviewViewSet, RegisterView
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='users')
@@ -11,4 +11,5 @@ router.register(r'reviews', ReviewViewSet, basename='reviews')
 urlpatterns = [
     path('', include(router.urls)),
     path("profile/", ProfileView.as_view(), name="profile"),
+    path("register/", RegisterView.as_view(), name="register"),
 ]

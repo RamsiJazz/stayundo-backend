@@ -1,3 +1,4 @@
+#users/views.py
 from rest_framework import mixins, viewsets,status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -7,6 +8,32 @@ from .serializers import UserSerializer, WishlistSerializer, ReviewSerializer
 from .models import User, Wishlist, Review
 from rest_framework.exceptions import PermissionDenied
 from drf_yasg.utils import swagger_auto_schema
+
+
+
+class RegisterView(APIView):
+    
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(request_body=UserSerializer)
+    def post(self, request):
+        user = request.user
+        name = request.data.get("name")
+        location = request.data.get("location")
+
+        updated_fields = []
+        if name:
+            user.name = name
+            updated_fields.append("name")
+        if location:
+            user.location = location
+            updated_fields.append("location")
+
+        if updated_fields:
+            user.save(update_fields=updated_fields)
+
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class UserViewSet(mixins.ListModelMixin,
                    mixins.RetrieveModelMixin,
