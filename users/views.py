@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
-from .serializers import UserSerializer, WishlistSerializer, ReviewSerializer
+from .serializers import UserSerializer, WishlistSerializer, ReviewSerializer, RegisterSerializer
 from .models import User, Wishlist, Review
 from rest_framework.exceptions import PermissionDenied
 from drf_yasg.utils import swagger_auto_schema
@@ -15,7 +15,7 @@ class RegisterView(APIView):
     
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(request_body=UserSerializer)
+    @swagger_auto_schema(request_body=RegisterSerializer)
     def post(self, request):
         user = request.user
         name = request.data.get("name")

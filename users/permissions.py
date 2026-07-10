@@ -1,11 +1,6 @@
 #users/permissions.py
-from .permissions import IsAdminOnly
+from rest_framework.permissions import BasePermission
 
-class UserViewSet(mixins.ListModelMixin,
-                   mixins.RetrieveModelMixin,
-                   mixins.UpdateModelMixin,
-                   viewsets.GenericViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsAdminOnly]
-    http_method_names = ['get', 'patch', 'head', 'options']
+class IsAdminOnly(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated and request.user.role == 'admin')
