@@ -8,21 +8,20 @@ class HostelApplicationCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = HostelApplication
         fields = [
-            'id', 'listing', 'full_name', 'age', 'gender',
+            'id', 'full_name', 'age', 'gender',
             'id_proof', 'duration_months', 'preferred_room_type', 'message',
         ]
         read_only_fields = ['id']
 
-    def validate_listing(self, listing):
+
+    def validate(self, attrs):
+        request = self.context['request']
+        listing = self.context['listing']
+
         if listing.category.housing_type != 'hostel':
             raise serializers.ValidationError("Applications are only allowed for hostel listings.")
         if listing.status != 'published' or not listing.is_active:
             raise serializers.ValidationError("This listing is not currently accepting applications.")
-        return listing
-
-    def validate(self, attrs):
-        request = self.context['request']
-        listing = attrs['listing']
 
         # Gender policy check
         pref = listing.gender_preference
@@ -47,6 +46,7 @@ class HostelApplicationCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data['applicant'] = self.context['request'].user
+        validated_data['listing'] = self.context['listing']
         return super().create(validated_data)
 
 

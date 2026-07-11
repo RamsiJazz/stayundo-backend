@@ -1,5 +1,6 @@
 # applications/views.py
 from rest_framework import generics, permissions
+from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
 from listings.models import Listing
 from .models import HostelApplication
@@ -17,7 +18,14 @@ class HostelApplicationCreateView(generics.CreateAPIView):
     """Student: submit 'Apply for stay' form"""
     serializer_class = HostelApplicationCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        if getattr(self, 'swagger_fake_view', False):
+            return context
+        context['listing'] = get_object_or_404(Listing, pk=self.kwargs['listing_id'])
+        return context
 
 class MyApplicationsView(generics.ListAPIView):
     """Student: list own applications (any status)"""
