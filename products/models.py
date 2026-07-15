@@ -25,7 +25,7 @@ class Product(models.Model):
     )
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    image = models.ImageField(upload_to="products/")
+    image = models.URLField(max_length=500, blank=True, null=True, help_text="Firebase Storage URL")
     price = models.DecimalField(max_digits=10, decimal_places=2)
     condition = models.CharField(max_length=20, choices=CONDITION_CHOICES)
     location = models.CharField(max_length=100)

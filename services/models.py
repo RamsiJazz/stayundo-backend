@@ -35,6 +35,8 @@ class Service(models.Model):
         ServiceCategory, on_delete=models.SET_NULL,
         null=True, related_name='services'
     )
+    description = models.TextField(blank=True, help_text="Short note Maps won't tell you, e.g. '24/7 govt hospital, 2km from campus'")
+    image = models.URLField(blank=True, help_text="Firebase Storage URL")
     phone = models.CharField(max_length=30, blank=True)
     maps_link = models.URLField(blank=True, help_text="Google Maps URL")
     city = models.CharField(max_length=100)
@@ -66,7 +68,7 @@ class MessRestaurantDetail(models.Model):
     monthly_rate = models.DecimalField(
         max_digits=8, decimal_places=2, null=True, blank=True
     )
-    menu_image = models.ImageField(upload_to='services/menus/', null=True, blank=True)
+    menu_image = models.URLField(blank=True, help_text="Firebase Storage URL — menu photo")
 
     def __str__(self):
         return f"Mess/Restaurant detail – {self.service.name}"

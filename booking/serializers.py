@@ -78,7 +78,7 @@ class BookingListSerializer(serializers.ModelSerializer):
     """Minimal — for listing booking cards"""
     listing_title = serializers.CharField(source='listing.title', read_only=True)
     listing_city = serializers.CharField(source='listing.city', read_only=True)
-    listing_cover = serializers.ImageField(source='listing.cover_image', read_only=True)
+    listing_cover = serializers.URLField(source='listing.cover_image', read_only=True)
     tenant_name = serializers.CharField(source='tenant.get_full_name', read_only=True)
 
     class Meta:

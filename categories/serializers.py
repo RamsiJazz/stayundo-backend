@@ -6,12 +6,12 @@ from .models import HousingCategory, ExpenseCategory
 class HousingCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = HousingCategory
-        fields = ['id', 'name', 'slug', 'housing_type', 'tagline', 'image', 'order']
+        fields = ['id', 'name', 'slug', 'housing_type', 'tagline', 'image','is_active', 'order']
 
 
 class ExpenseCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ExpenseCategory
-        fields = ['id', 'name', 'slug', 'image', 'description', 'order']
+        fields = ['id', 'name', 'slug', 'image', 'description', 'is_active','order']
 
 

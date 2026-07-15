@@ -1,11 +1,9 @@
 #categories/views.py
 from rest_framework import generics, permissions, filters
-from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import HousingCategory, ExpenseCategory
 from .serializers import HousingCategorySerializer, ExpenseCategorySerializer
 from .permissions import IsAdminOrReadOnly, IsOwnerOrAdmin
-from rest_framework.parsers import MultiPartParser, FormParser
 
 # --- Housing Categories  ---
 
@@ -20,15 +18,12 @@ class HousingCategoryAdminView(generics.ListCreateAPIView):
     queryset = HousingCategory.objects.all()
     serializer_class = HousingCategorySerializer
     permission_classes = [IsAdminOrReadOnly]
-    parser_classes = [MultiPartParser, FormParser]
 
 class HousingCategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = HousingCategory.objects.all()
     serializer_class = HousingCategorySerializer
     permission_classes = [IsAdminOrReadOnly]
     lookup_field = 'slug'
-    parser_classes = [MultiPartParser, FormParser]
-
 
 # --- Expense Categories ---
 
@@ -43,12 +38,9 @@ class ExpenseCategoryAdminView(generics.ListCreateAPIView):
     queryset = ExpenseCategory.objects.all()
     serializer_class = ExpenseCategorySerializer
     permission_classes = [IsAdminOrReadOnly]
-    parser_classes = [MultiPartParser, FormParser]
 
 class ExpenseCategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ExpenseCategory.objects.all()
     serializer_class = ExpenseCategorySerializer
     permission_classes = [IsAdminOrReadOnly]
     lookup_field = 'slug'
-    parser_classes = [MultiPartParser, FormParser]
-

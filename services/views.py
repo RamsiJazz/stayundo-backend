@@ -10,6 +10,8 @@ class ServiceCategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return ServiceCategory.objects.none()
         return ServiceCategory.objects.filter(is_active=True)
 
 
@@ -21,12 +23,16 @@ class ServiceViewSet(viewsets.ModelViewSet):
     ordering_fields = ['name', 'created_at']
 
     def get_queryset(self):
-        qs = Service.objects.filter(is_active=True).select_related(
+        if getattr(self, 'swagger_fake_view', False):
+            return Service.objects.none()
+        qs = Service.objects.select_related(
             'category',
             'mess_detail',
             'transport_detail',
             'hospital_detail',
             'attraction_detail',
+            'security_detail',
+            'education_detail',
         )
         if not (self.request.user and self.request.user.is_staff):
             qs = qs.filter(is_active=True)

@@ -54,76 +54,77 @@ DETAIL_CONFIG = {
 class ServiceSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)
     service_type = serializers.CharField(source='category.service_type', read_only=True)
-
+    icon = serializers.CharField(source='category.icon', read_only=True)
+    
     # Only one will be non-null depending on the service type
-    mess_detail = MessRestaurantDetailSerializer(read_only=True)
-    transport_detail = TransportDetailSerializer(read_only=True)
-    hospital_detail = HospitalDetailSerializer(read_only=True)
-    attraction_detail = AttractionDetailSerializer(read_only=True)
+    mess_detail = MessRestaurantDetailSerializer(required=False, allow_null=True)
+    transport_detail = TransportDetailSerializer(required=False, allow_null=True)
+    hospital_detail = HospitalDetailSerializer(required=False, allow_null=True)
+    attraction_detail = AttractionDetailSerializer(required=False, allow_null=True)
     security_detail = SecurityDetailSerializer(required=False, allow_null=True)
     education_detail = EducationDetailSerializer(required=False, allow_null=True)
 
     class Meta:
         model = Service
         fields = [
-            'id', 'name', 'category', 'category_name', 'service_type',
-            'phone', 'maps_link', 'city', 'is_verified', 'is_active', 'created_at',
+            'id', 'name', 'description', 'image','category', 'category_name', 'service_type',
+            'icon','phone', 'maps_link', 'city', 'is_verified', 'is_active', 'created_at',
             'mess_detail', 'transport_detail', 'hospital_detail', 'attraction_detail',
             'security_detail', 'education_detail',
         ]
         read_only_fields = ['created_at']
-def validate(self, attrs):
-    # Guard against sending more than one detail type at once — the
-    # models are 1:1 with Service, so only one should ever apply.
-    detail_keys_present = [k for k in DETAIL_CONFIG if k in self.initial_data]
-    if len(detail_keys_present) > 1:
-        raise serializers.ValidationError(
-            f"Only one detail type is allowed per service, got: {detail_keys_present}"
-        )
-    category = attrs.get('category') or getattr(self.instance, 'category', None)
-    if detail_keys_present and category:
-        expected_key = f"{category.service_type}_detail"
-        if detail_keys_present[0] != expected_key and expected_key in DETAIL_CONFIG:
+    def validate(self, attrs):
+        # Guard against sending more than one detail type at once — the
+        # models are 1:1 with Service, so only one should ever apply.
+        detail_keys_present = [k for k in DETAIL_CONFIG if k in self.initial_data]
+        if len(detail_keys_present) > 1:
             raise serializers.ValidationError(
-                f"'{detail_keys_present[0]}' doesn't match category service_type "
-                f"'{category.service_type}' (expected '{expected_key}')"
+                f"Only one detail type is allowed per service, got: {detail_keys_present}"
             )
-    return attrs
+        category = attrs.get('category') or getattr(self.instance, 'category', None)
+        if detail_keys_present and category:
+            expected_key = f"{category.service_type}_detail"
+            if detail_keys_present[0] != expected_key and expected_key in DETAIL_CONFIG:
+                raise serializers.ValidationError(
+                    f"'{detail_keys_present[0]}' doesn't match category service_type "
+                    f"'{category.service_type}' (expected '{expected_key}')"
+                )
+        return attrs
 
-def _pop_detail_data(self, validated_data):
-    """Remove and return whichever single detail payload was sent, if any."""
-    for key in DETAIL_CONFIG:
-        if key in validated_data:
-            return key, validated_data.pop(key)
-    return None, None
+    def _pop_detail_data(self, validated_data):
+        """Remove and return whichever single detail payload was sent, if any."""
+        for key in DETAIL_CONFIG:
+            if key in validated_data:
+                return key, validated_data.pop(key)
+        return None, None
 
-def create(self, validated_data):
-    detail_key, detail_data = self._pop_detail_data(validated_data)
-    service = Service.objects.create(**validated_data)
+    def create(self, validated_data):
+        detail_key, detail_data = self._pop_detail_data(validated_data)
+        service = Service.objects.create(**validated_data)
 
-    if detail_key and detail_data is not None:
-        model_cls, _ = DETAIL_CONFIG[detail_key]
-        model_cls.objects.create(service=service, **detail_data)
+        if detail_key and detail_data is not None:
+            model_cls, _ = DETAIL_CONFIG[detail_key]
+            model_cls.objects.create(service=service, **detail_data)
 
-    return service
+        return service
 
-def update(self, instance, validated_data):
-    detail_key, detail_data = self._pop_detail_data(validated_data)
+    def update(self, instance, validated_data):
+        detail_key, detail_data = self._pop_detail_data(validated_data)
 
-    for attr, value in validated_data.items():
-        setattr(instance, attr, value)
-    instance.save()
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
 
-    if detail_key:
-        model_cls, _ = DETAIL_CONFIG[detail_key]
-        if detail_data is None:
-            # allow clearing the detail record explicitly with `"mess_detail": null`
-            model_cls.objects.filter(service=instance).delete()
-        else:
-            model_cls.objects.update_or_create(
-                service=instance, defaults=detail_data
-            )
+        if detail_key:
+            model_cls, _ = DETAIL_CONFIG[detail_key]
+            if detail_data is None:
+                # allow clearing the detail record explicitly with `"mess_detail": null`
+                model_cls.objects.filter(service=instance).delete()
+            else:
+                model_cls.objects.update_or_create(
+                    service=instance, defaults=detail_data
+                )
 
-    return instance
+        return instance
 
 

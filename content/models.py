@@ -10,7 +10,7 @@ class NewsPost(models.Model):
     title = models.CharField(max_length=200)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='news')
     summary = models.TextField()
-    image = models.ImageField(upload_to='news/', null=True, blank=True)
+    image = models.URLField(null= True, blank=True, help_text="Firebase Storage URL")
     source_link = models.URLField(blank=True)
     city = models.CharField(max_length=100, blank=True)
     is_active = models.BooleanField(default=True)
@@ -42,7 +42,7 @@ class CityClimate(models.Model):
     city = models.CharField(max_length=100, unique=True)
     summary = models.TextField(blank=True)
     best_time_to_visit = models.CharField(max_length=100, blank=True)
-    banner_image = models.ImageField(upload_to='climate/', null=True, blank=True)
+    banner_image = models.URLField(null= True, blank=True, help_text="Firebase Storage URL")
     weather_api_city_key = models.CharField(
         max_length=100, blank=True,
         help_text="City key for OpenWeatherMap API on frontend"

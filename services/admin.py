@@ -40,4 +40,5 @@ class ServiceAdmin(admin.ModelAdmin):
     list_display = ['name', 'category', 'city', 'is_verified', 'is_active', 'created_at']
     list_filter = ['category__service_type', 'is_verified', 'is_active', 'city']
     search_fields = ['name', 'city']
+    fields = ['name', 'description', 'image', 'category', 'phone', 'maps_link', 'city', 'is_verified', 'is_active']
     inlines = [MessRestaurantDetailInline, TransportDetailInline, HospitalDetailInline, AttractionDetailInline, SecurityDetailInline, EducationDetailInline]

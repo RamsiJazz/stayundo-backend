@@ -36,7 +36,7 @@ class Listing(models.Model):
     quality_grade = models.CharField(max_length=20, choices=QUALITY_GRADES, default="standard")
 
     # --- Media ---
-    cover_image = models.ImageField(upload_to="listings/covers/", blank=True, null=True)
+    cover_image = models.URLField(null=True, blank=True, help_text="Firebase Storage URL")
 
     # --- Location ---
     address = models.CharField(max_length=255)
@@ -115,7 +115,7 @@ class Listing(models.Model):
 
 class ListingImage(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to="listings/gallery/")
+    image = models.URLField(max_length=500, help_text="Firebase Storage URL")
     alt_text = models.CharField(max_length=255, blank=True)
     is_primary = models.BooleanField(default=False)
     display_order = models.PositiveIntegerField(default=0)

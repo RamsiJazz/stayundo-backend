@@ -13,7 +13,7 @@ class HousingCategory(models.Model):
     slug = models.SlugField(unique=True)
     housing_type = models.CharField(max_length=20, choices=HOUSING_TYPES)
     tagline = models.CharField(max_length=200, default='Explore premium listings')
-    image = models.ImageField(upload_to='housing_categories/')
+    image = models.URLField(max_length=500)
     is_active = models.BooleanField(default=True)
     order = models.PositiveIntegerField(default=0)
 
@@ -29,7 +29,7 @@ class ExpenseCategory(models.Model):
     """Image 2 - Browse Categories (Accommodation Rent, Daily Food, etc.)"""
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
-    image = models.ImageField(upload_to='expense_categories/')
+    image = models.URLField(max_length=500)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
     order = models.PositiveIntegerField(default=0)
