@@ -38,7 +38,7 @@ class NewsPostViewSet(viewsets.ModelViewSet):
         return qs
 
 
-class PublicHolidayViewSet(viewsets.ModelViewSet):
+class PublicHolidayViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Per requirements, no API is strictly required for this model,
     but it's included here as read-only + admin-managed in case
@@ -71,7 +71,7 @@ class CityClimateViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter]
     search_fields = ['city']
-    lookup_field = 'city'  # allows /api/climate/Bangalore/ instead of by id
+    filterset_fields = ['city']  # allows /api/climate/Bangalore/ instead of by id
 
 
 class FAQViewSet(viewsets.ModelViewSet):

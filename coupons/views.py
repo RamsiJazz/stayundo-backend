@@ -17,8 +17,17 @@ from .permissions import IsAdminOnly, IsAdminOrAuthenticatedReadOnly
 class CouponListCreateView(generics.ListCreateAPIView):
     """Admin: list all coupons / create new coupon"""
     serializer_class = CouponSerializer
-    permission_classes = [IsAdminOnly]
-    queryset = Coupon.objects.all()
+    permission_classes = [IsAdminOrAuthenticatedReadOnly]
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return Coupon.objects.all()
+
+        now = timezone.now()
+        return Coupon.objects.filter(
+            is_active=True,
+            start_date__lte=now,
+            end_date__gte=now
+        )
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
@@ -61,7 +70,7 @@ class CouponValidateView(APIView):
         listing_id = serializer.validated_data.get('listing_id')
         amount = serializer.validated_data.get('amount', 0)
 
-        coupon = get_object_or_404(Coupon, code=code)
+        coupon = get_object_or_404(Coupon, code__iexact=code)
 
         # 1. Check coupon validity
         if not coupon.is_valid():

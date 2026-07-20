@@ -1,5 +1,4 @@
 #products/views.py
-from django.shortcuts import render
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.parsers import MultiPartParser, FormParser
 # Create your views here.
@@ -109,13 +108,17 @@ class MyProductsView(generics.ListAPIView):
 
 
 class ProductUpdateView(generics.RetrieveUpdateDestroyAPIView):
-    """Owner or admin: edit/delete; e.g. PATCH is_available=False to mark sold."""
     serializer_class = ProductSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
-    lookup_field = 'id'
+    lookup_field = "id"
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Product.objects.none()
+
         user = self.request.user
+
         if user.is_staff:
             return Product.objects.all()
+
         return Product.objects.filter(owner=user)

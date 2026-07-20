@@ -46,9 +46,11 @@ class FAQSerializer(serializers.ModelSerializer):
 
 class SupportTicketUserSerializer(serializers.ModelSerializer):
     """Minimal nested representation of the ticket owner."""
+    full_name = serializers.CharField(source="get_full_name", read_only=True)
+
     class Meta:
         model = User
-        fields = ['id', 'name', 'email']
+        fields = ['id', 'full_name', 'email']
 
 
 class SupportTicketSerializer(serializers.ModelSerializer):

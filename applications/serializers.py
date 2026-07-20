@@ -53,7 +53,7 @@ class HostelApplicationCreateSerializer(serializers.ModelSerializer):
 # ── Read view: student sees own application, seller sees list ────
 class HostelApplicationSerializer(serializers.ModelSerializer):
     listing_title = serializers.CharField(source='listing.title', read_only=True)
-    applicant_name = serializers.CharField(source='applicant.get_full_name', read_only=True)
+    applicant_name = serializers.CharField(source='applicant.name', read_only=True)
     applicant_email = serializers.CharField(source='applicant.email', read_only=True)
 
     class Meta:

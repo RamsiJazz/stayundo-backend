@@ -6,7 +6,7 @@ from coupons.models import Coupon
 
 
 class BookingStatusLogSerializer(serializers.ModelSerializer):
-    changed_by_name = serializers.CharField(source='changed_by.get_full_name', read_only=True)
+    changed_by_name = serializers.CharField(source='changed_by.name', read_only=True)
 
     class Meta:
         model = BookingStatusLog
@@ -79,7 +79,7 @@ class BookingListSerializer(serializers.ModelSerializer):
     listing_title = serializers.CharField(source='listing.title', read_only=True)
     listing_city = serializers.CharField(source='listing.city', read_only=True)
     listing_cover = serializers.URLField(source='listing.cover_image', read_only=True)
-    tenant_name = serializers.CharField(source='tenant.get_full_name', read_only=True)
+    tenant_name = serializers.CharField(source='tenant.name', read_only=True)
 
     class Meta:
         model = Booking
@@ -95,7 +95,7 @@ class BookingDetailSerializer(serializers.ModelSerializer):
     status_logs = BookingStatusLogSerializer(many=True, read_only=True)
     listing_title = serializers.CharField(source='listing.title', read_only=True)
     listing_slug = serializers.CharField(source='listing.slug', read_only=True)
-    tenant_name = serializers.CharField(source='tenant.get_full_name', read_only=True)
+    tenant_name = serializers.CharField(source='tenant.name', read_only=True)
     tenant_email = serializers.CharField(source='tenant.email', read_only=True)
 
     class Meta:

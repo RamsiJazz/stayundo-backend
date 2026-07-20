@@ -1,23 +1,24 @@
-#categories/views.py
-from rest_framework import generics, permissions, filters
-from rest_framework.views import APIView
+# categories/views.py
+from rest_framework import generics
 from .models import HousingCategory, ExpenseCategory
 from .serializers import HousingCategorySerializer, ExpenseCategorySerializer
-from .permissions import IsAdminOrReadOnly, IsOwnerOrAdmin
+from .permissions import IsAdminOrReadOnly
 
-# --- Housing Categories  ---
 
-class HousingCategoryListView(generics.ListAPIView):
-    """Public: List all active housing categories"""
-    queryset = HousingCategory.objects.filter(is_active=True)
-    serializer_class = HousingCategorySerializer
-    permission_classes = [permissions.AllowAny]
-
-class HousingCategoryAdminView(generics.ListCreateAPIView):
-    """Admin only: Create/manage housing categories"""
-    queryset = HousingCategory.objects.all()
+class HousingCategoryListCreateView(generics.ListCreateAPIView):
+    """
+    GET: public — active categories only for regular users, all for admins
+    POST: admin only
+    """
     serializer_class = HousingCategorySerializer
     permission_classes = [IsAdminOrReadOnly]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user and user.is_authenticated and user.is_staff:
+            return HousingCategory.objects.all()
+        return HousingCategory.objects.filter(is_active=True)
+
 
 class HousingCategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = HousingCategory.objects.all()
@@ -25,19 +26,17 @@ class HousingCategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminOrReadOnly]
     lookup_field = 'slug'
 
-# --- Expense Categories ---
 
-class ExpenseCategoryListView(generics.ListAPIView):
-    """Public: Browse all expense categories"""
-    queryset = ExpenseCategory.objects.filter(is_active=True)
-    serializer_class = ExpenseCategorySerializer
-    permission_classes = [permissions.AllowAny]
-   
-
-class ExpenseCategoryAdminView(generics.ListCreateAPIView):
-    queryset = ExpenseCategory.objects.all()
+class ExpenseCategoryListCreateView(generics.ListCreateAPIView):
     serializer_class = ExpenseCategorySerializer
     permission_classes = [IsAdminOrReadOnly]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user and user.is_authenticated and user.is_staff:
+            return ExpenseCategory.objects.all()
+        return ExpenseCategory.objects.filter(is_active=True)
+
 
 class ExpenseCategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ExpenseCategory.objects.all()

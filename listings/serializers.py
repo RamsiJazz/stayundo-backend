@@ -70,7 +70,7 @@ class ListingDetailSerializer(serializers.ModelSerializer):
     specifications = ListingSpecificationSerializer(many=True, read_only=True)
     offers = ListingOfferSerializer(many=True, read_only=True)
     effective_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
-    seller_name = serializers.CharField(source='seller.get_full_name', read_only=True)
+    seller_name = serializers.CharField(source='seller.name', read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
 
     class Meta:

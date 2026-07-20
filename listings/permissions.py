@@ -5,13 +5,11 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 class IsBuyer(BasePermission):
     """Authenticated non-seller, non-admin user"""
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and not request.user.is_staff
-
-
-class IsSeller(BasePermission):
-    """Any authenticated user acting as seller (owns a listing)"""
-    def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated
+        return (
+    request.user
+    and request.user.is_authenticated
+    and request.user.role == "buyer"
+)
 
 
 class IsSellerOrAdmin(BasePermission):

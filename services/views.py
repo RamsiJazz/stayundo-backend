@@ -10,9 +10,15 @@ class ServiceCategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
+        if getattr(self, "swagger_fake_view", False):
             return ServiceCategory.objects.none()
-        return ServiceCategory.objects.filter(is_active=True)
+
+        qs = ServiceCategory.objects.all()
+
+        if not self.request.user.is_staff:
+            qs = qs.filter(is_active=True)
+
+        return qs
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
